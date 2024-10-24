@@ -5,22 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Cargos;
+use App\Models\Empleados;
 
-class Empleados extends Model
+class Aumentos extends Model
 {
     use HasFactory;
 
-    protected $table = "empleados";
+    protected $table = "aumentos";
 
     protected $fillable = [
-        "nombre",
-        "apellidos",
-        "sexo",
-        "fecha_ingreso",
-        "cargo_id"
+        "fecha",
+        "valor",
+        "cargo_id",
+        "empleado_id"
     ];
 
     public function cargo() {
         return $this->belongsTo(Cargos::class, 'cargo_id');
+    }
+
+    public function empleado() {
+        return $this->belongsTo(Empleados::class, 'empleado_id');
     }
 }

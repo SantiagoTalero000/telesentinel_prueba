@@ -3,7 +3,6 @@
     <div class="flex gap-8">
         <a href="{{ route('crear.empleados.view') }}">Crear Empleados</a>
         <a href="{{ route('crear.cargos.view') }}">Crear Cargos</a>
-        <a href="{{ route('crear.empleados.view') }}">Historial Salarios</a>
         {{-- <a href="">Actualización</a>
         <a href="">Eliminación</a> --}}
     </div>

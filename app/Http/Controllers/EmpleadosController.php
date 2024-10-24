@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Empleados;
 use App\Models\Cargos;
+use App\Models\Aumentos;
 
 class EmpleadosController extends Controller
 {
     public function indexView(){
         $data = [
-            "empleados" => Empleados::with('cargo')->get()
+            "empleados" => Aumentos::select('aumentos.*')
+                ->join(DB::raw('(SELECT MAX(id) as id FROM aumentos GROUP BY empleado_id) as latest'), 'aumentos.id', '=', 'latest.id')
+                ->with('empleado', 'cargo')
+                ->get()
         ];
         return view('home', $data);
     }
@@ -37,7 +42,16 @@ class EmpleadosController extends Controller
                 return redirect()->back();
             }
 
-            Empleados::create($validate);
+            $empleado = Empleados::create($validate);
+
+            $salario = Cargos::where("id", $request->cargo_id)->value("salario");
+
+            $aumento = new Aumentos();
+            $aumento -> fecha = $request->fecha_ingreso;
+            $aumento -> valor = $salario;
+            $aumento -> cargo_id = $request->cargo_id;
+            $aumento -> empleado_id = $empleado->id;
+            $aumento -> save();
 
             session()->flash('success', 'Se agrego el empleado exitosamente');
 
@@ -67,9 +81,15 @@ class EmpleadosController extends Controller
                 "cargo_id" => "required",
             ]);
 
-            if(Empleados::where("nombre", $request->nombre)->where("apellidos", $request->apellidos)->where("cargo_id", $request->cargo_id)->exists()){
-                session()->flash('error', "El nombre y cargo ya estan registrados");
-                return redirect()->back();
+            $salario = Cargos::where("id", $request->cargo_id)->value("salario");
+
+            if(Empleados::where('id', $id)->value("cargo_id") != $request->cargo_id){
+                $aumento = new Aumentos();
+                $aumento -> fecha = $request->fecha_ingreso;
+                $aumento -> valor = $salario;
+                $aumento -> cargo_id = $request->cargo_id;
+                $aumento -> empleado_id = $id;
+                $aumento -> save();
             }
 
             $empleado = Empleados::findOrFail($id);
@@ -83,7 +103,7 @@ class EmpleadosController extends Controller
             session()->flash('success', 'Se actualizo el empleado exitosamente');
 
             return redirect()->route('empleados.view');
-        } catch (\Throwable $th) {
+        } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
 
             return redirect()->back();
@@ -92,10 +112,12 @@ class EmpleadosController extends Controller
 
     public function deleteEmpleado($id){
         try {
-            
+
+            Aumentos::where('empleado_id', $id)->delete();
+
             $empleado = Empleados::findOrFail($id);
             $empleado->delete();
-            
+
             session()->flash('success', 'Se elimino el empleado exitosamente');
 
             return response()->json([

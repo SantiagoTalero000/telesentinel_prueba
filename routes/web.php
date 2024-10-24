@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\CargosController;
+use App\Http\Controllers\HistorialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,7 @@ Route::post('/empleados/crear', [EmpleadosController::class, 'crearEmpleado'])->
 
 Route::get('/cargos/crear', [CargosController::class, 'crearCargosView'])->name('crear.cargos.view');
 Route::post('/cargos/crear', [CargosController::class, 'crearCargos'])->name('crear.cargo');
+
+Route::get('/salarios/historial/{id}', [HistorialController::class, 'historialSalariosView'])->name('historial.salarios');
+Route::get('/salarios/aumento/{id}', [HistorialController::class, 'aumentoUpdateView'])->name('aumento.update');
+Route::post('/salarios/aumento/{id}', [HistorialController::class, 'aumentoUpdate'])->name('generar.aumento');

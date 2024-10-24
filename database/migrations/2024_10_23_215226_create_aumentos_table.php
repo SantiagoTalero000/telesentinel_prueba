@@ -16,7 +16,7 @@ class CreateAumentosTable extends Migration
         Schema::create('aumentos', function (Blueprint $table) {
             $table->id();
             $table->date('fecha');
-            $table->decimal('valor');
+            $table->decimal('valor', 20, 2);
             $table->unsignedBigInteger('cargo_id');
             $table->unsignedBigInteger('empleado_id');
             $table->timestamps();

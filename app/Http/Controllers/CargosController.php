@@ -15,7 +15,7 @@ class CargosController extends Controller
         try {
             $validate = $request->validate([
                 "cargo" => 'required',
-                "salario" => 'required|numeric'
+                "salario" => 'required|integer'
             ]);
 
             Cargos::create($validate);
